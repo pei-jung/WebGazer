@@ -1,89 +1,148 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
-    <HEAD>
-        <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-        <TITLE>Simple Demonstration of how WebGazer.js works</TITLE>
-    </HEAD>
-    <BODY LANG="en-US" LINK="#0000ff" DIR="LTR">
-    <div id="mydiv">
-        <h1 style="color:#C0C0C0" align="right">
-            Click on a few locations within the screen<br>
-            while looking purposefully at the cursor.<br>
-            Both clicks and cursor movements<br>
-            make the predictions more accurate. 
-        </h1>
-    </div>
+	<HEAD>
+		<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8"></META>
+		<TITLE>Simple Demonstration of how WebGazer.js works</TITLE>
+		<STYLE>
+			body {
+				font-size: 100px;
+				font-family: monospace;
+			}
+
+			#textInput {
+				margin-top: 250px;
+				margin-right: 10px;
+			}
+
+			.keyboard {
+				display: inline-block;
+				text-align: center;
+			}
+
+			.row {
+				display: flex;
+			}
+
+			.letter {
+				justify-content: center;
+				margin: 50px 20px;
+				padding: 150px 180px;
+				border: 1px solid #CCC;
+				border-radius: 4px;
+				align-items: center;
+			}
+
+			.row-4 .letter {
+				flex-grow: 1;
+				text-align: center;
+			}
+		</STYLE>
+	</HEAD>
+	<BODY LANG="en-US" LINK="#0000ff" DIR="LTR">
+		<input id="textInput" type="text" value="" style="float: right" />
+		<div class="keyboard">
+			<div class="row">
+				<div class="letter">A</div>
+				<div class="letter">B</div>
+				<div class="letter">C</div>
+			</div>
+		</div>
 
 
-        <script src="build/webgazer.js"></script>
-        <script>
-window.onload = function() {
-    webgazer.setRegression('ridge') /* currently must set regression and tracker */
-        .setTracker('clmtrackr')
-        .setGazeListener(function(data, clock) {
-         //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
-         //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
-        })
-        .begin()
-        .showPredictionPoints(true); /* shows a square every 100 milliseconds where current prediction is */
+		<script src="build/webgazer.js"></script>
+		<script>
+			window.onload = function() {
+				webgazer.setRegression('ridge') /* currently must set regression and tracker */
+					.setTracker('clmtrackr')
+					// .setGazeListener(function(data, clock) {
+					// 	 //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
+					// 	 //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
+					// })
+					.begin()
+					.showPredictionPoints(true); /* shows a square every 100 milliseconds where current prediction is */
 
-    var width = 320;
-    var height = 240;
-    var topDist = '0px';
-    var leftDist = '0px';
-    
-    var setup = function() {
-        var video = document.getElementById('webgazerVideoFeed');
-        video.style.display = 'block';
-        video.style.position = 'absolute';
-        video.style.top = topDist;
-        video.style.left = leftDist;
-        video.width = width;
-        video.height = height;
-        video.style.margin = '0px';
+				var width = 320;
+				var height = 240;
+				var topDist = '0px';
+				var leftDist = '0px';
 
-        webgazer.params.imgWidth = width;
-        webgazer.params.imgHeight = height;
+				
+				var setup = function() {
+					var video = document.getElementById('webgazerVideoFeed');
+					video.style.display = 'block';
+					video.style.position = 'absolute';
+					video.style.top = topDist;
+					video.style.left = leftDist;
+					video.width = width;
+					video.height = height;
+					video.style.margin = '0px';
 
-        var overlay = document.createElement('canvas');
-        overlay.id = 'overlay';
-        overlay.style.position = 'absolute';
-        overlay.width = width;
-        overlay.height = height;
-        overlay.style.top = topDist;
-        overlay.style.left = leftDist;
-        overlay.style.margin = '0px';
+					webgazer.params.imgWidth = width;
+					webgazer.params.imgHeight = height;
 
-        document.body.appendChild(overlay);
+					var overlay = document.createElement('canvas');
+					overlay.id = 'overlay';
+					overlay.style.position = 'absolute';
+					overlay.width = width;
+					overlay.height = height;
+					overlay.style.top = topDist;
+					overlay.style.left = leftDist;
+					overlay.style.margin = '0px';
 
-        var cl = webgazer.getTracker().clm;
+					document.body.appendChild(overlay);
 
-        function drawLoop() {
-            requestAnimFrame(drawLoop);
-            overlay.getContext('2d').clearRect(0,0,width,height);
-            if (cl.getCurrentPosition()) {
-                cl.draw(overlay);
-            }
-        }
-        drawLoop();
-    };
+					var cl = webgazer.getTracker().clm;
 
-    function checkIfReady() {
-        if (webgazer.isReady()) {
-            setup();
-        } else {
-            setTimeout(checkIfReady, 100);
-        }
-    }
-    setTimeout(checkIfReady,100);
-};
+					function drawLoop() {
+						requestAnimFrame(drawLoop);
+						overlay.getContext('2d').clearRect(0,0,width,height);
+						if (cl.getCurrentPosition()) {
+							cl.draw(overlay);
+						}
+					}
+					drawLoop();
+				};
+
+				function checkIfReady() {
+					if (webgazer.isReady()) {
+						setup();
+					} else {
+						setTimeout(checkIfReady, 300);
+					}
+				}
+				setTimeout(checkIfReady,300);
+			};
+
+			window.addEventListener("keypress", function(e) {
+				var prediction = webgazer.getCurrentPrediction();
+				
+				if (prediction) {
+				    var x = prediction.x;
+				    var y = prediction.y;
+
+				    var el = document.elementFromPoint(x, y);
+
+				    if (!el) {
+				    	return;
+				    }
+
+				    var val = el.innerHTML;
+
+				    if (/^[a-zA-Z]+$/.test(val)) {
+				    	console.log(val);
+
+						var input = document.getElementById("textInput");
+				    	input.setAttribute("value", input.getAttribute("value") + val);
+				    }
+				}
+			})
 
 
-window.onbeforeunload = function() {
-    //webgazer.end(); //Uncomment if you want to save the data even if you reload the page.
-    window.localStorage.clear(); //Comment out if you want to save data across different sessions 
-}
-        </script>
+			window.onbeforeunload = function() {
+				//webgazer.end(); //Uncomment if you want to save the data even if you reload the page.
+				window.localStorage.clear(); //Comment out if you want to save data across different sessions 
+			}
+		</script>
 
-    </BODY>
+	</BODY>
 </HTML>
