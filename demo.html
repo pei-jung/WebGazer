@@ -10,13 +10,30 @@
 			}
 
 			#textInput {
-				margin-top: 250px;
-				margin-right: 10px;
+				line-height: 24px;
+			}
+
+			input[type="text"] {
+				font-size: 24px;
+				margin-right: 16px;
+			}
+
+			#reset {
+				padding: 8px 16px;
+				border-radius: 4px;
+			}
+
+			.output {
+				display: flex;
+				align-items: center;
+				float: right;
 			}
 
 			.keyboard {
+				margin-top: 200px;
 				display: inline-block;
 				text-align: center;
+				max-width: 90vw;
 			}
 
 			.row {
@@ -39,8 +56,12 @@
 		</STYLE>
 	</HEAD>
 	<BODY LANG="en-US" LINK="#0000ff" DIR="LTR">
-		<input id="textInput" type="text" value="" style="float: right" />
 		<div class="keyboard">
+			<div class="output">
+				<input id="textInput" type="text" value="" />
+				<button id="reset">Reset</button>
+			</div>
+
 			<div class="row">
 				<div class="letter">A</div>
 				<div class="letter">B</div>
@@ -111,6 +132,14 @@
 					}
 				}
 				setTimeout(checkIfReady,300);
+
+				var reset = document.getElementById('reset');
+
+				reset.addEventListener("click", function(e) {
+					var input = document.getElementById("textInput");
+
+					input.setAttribute("value", "");
+				});
 			};
 
 			window.addEventListener("keypress", function(e) {
